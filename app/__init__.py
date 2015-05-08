@@ -9,6 +9,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///polls.db'
 api = Api(app)
 db = SQLAlchemy(app)
 
+# - - - - Database Models - - - - - - - - - - - - - - -
 class Question(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	text = db.Column(db.String(200), nullable=False)
@@ -31,6 +32,7 @@ class Choice(db.Model):
 		self.question_id = question_id
 
 
+# - -  - - - API Routes - - - - - - - - - - - - - - -
 class Poll(Resource):
     def get(self, poll_id):
 		question = Question.query.filter_by(id=poll_id).one()
