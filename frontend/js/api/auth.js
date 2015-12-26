@@ -10,7 +10,10 @@ define(["jquery"],
                     "password": password
                 }
             }).done(function(res){
-                return res;
+                var token = res;
+                if (token){
+                    localStorage.setItem("flaskapitoken", "Bearer " + token);
+                }
             });
         }
         return self;
