@@ -8,3 +8,5 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///polls.db'
 api = Api(app)
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
+
+from api import *
