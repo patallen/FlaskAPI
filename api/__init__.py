@@ -25,4 +25,4 @@ def authenticate_for_jwt():
     if user and user.verify_password(password):
         token = jss.dumps({'username': username})
         return Response(token, 200)
-    return "NOPE"
+    return Response("Could not authenticate user.", 400)

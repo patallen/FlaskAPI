@@ -3,7 +3,7 @@ define(["jquery"],
         var self = {};
         self.getAuthToken = function(username, password){
             $.ajax({
-                url: "http://localhost:5000/authenticate/",
+                url: "http://api.flaskapi.dev/authenticate/",
                 method: "POST",
                 data: {
                     "username": username,
@@ -13,7 +13,12 @@ define(["jquery"],
                 var token = res;
                 if (token){
                     localStorage.setItem("flaskapitoken", "Bearer " + token);
+                    console.log(token)
                 }
+            }).fail(function(res){
+                var error = res.responseText;
+                console.log(error);
+                return error;
             });
         }
         return self;
