@@ -1,12 +1,12 @@
 from app import app
 from models.users import User
-from itsdangerous import JSONWebSignatureSerializer, BadSignature
+from itsdangerous import TimedJSONWebSignatureSerializer, BadSignature
 from flask import request, Response
 from decorators import crossdomain
 import json
 
 
-jss = JSONWebSignatureSerializer('dude')
+jss = TimedJSONWebSignatureSerializer('dude')
 
 
 @app.route('/authenticate/', methods=['POST'])
@@ -22,7 +22,7 @@ def authenticate_for_jwt():
             user = None
 
     if user and user.verify_password(password):
-        token = jss.dumps({'username': username})
+        token = create_jwt_token(None, user)
         return Response(token, 200)
     return Response("Could not authenticate user.", 400)
 
@@ -43,3 +43,11 @@ def get_jwt_payload():
     except BadSignature:
         return None
     return payload
+
+
+def create_jwt_token(exp_min, user):
+    user = user.username
+    token = jss.dumps({
+        'username': user
+    })
+    return token
