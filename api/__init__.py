@@ -1,12 +1,9 @@
 from app import app
 from models.users import User
-from itsdangerous import TimedJSONWebSignatureSerializer, BadSignature
 from flask import request, Response
-from decorators import crossdomain
+from decorators import crossdomain, handle_jwt_auth
 import json
-
-
-jss = TimedJSONWebSignatureSerializer('dude')
+from .helpers import get_jwt_payload, create_jwt_token
 
 
 @app.route('/authenticate/', methods=['POST'])
@@ -27,14 +24,15 @@ def authenticate_for_jwt():
     return Response("Could not authenticate user.", 400)
 
 
-@app.route('protected', methods=['POST'])
+@app.route('/protected/', methods=['POST'])
+@handle_jwt_auth
 def test_protected():
     """
     This view should only return json if the user is authorized
     via JWT token in header of request.
     This should be completed using a decorator function.
     """
-    pass
+    return Response("You're logged in.", 200)
 
 
 @app.route('/test/', methods=['POST'])
@@ -43,21 +41,3 @@ def test_jwt():
     if payload is None:
         return Response("Trouble Authenticating", 400)
     return Response(json.dumps(payload), 200)
-
-
-def get_jwt_payload():
-    token_str = request.headers['Authentication']
-    try:
-        token = token_str.split(' ')[1]
-        payload = jss.loads(token)
-    except BadSignature:
-        return None
-    return payload
-
-
-def create_jwt_token(exp_min, user):
-    user = user.username
-    token = jss.dumps({
-        'username': user
-    })
-    return token

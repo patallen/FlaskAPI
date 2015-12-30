@@ -1,6 +1,32 @@
 from datetime import timedelta
-from flask import make_response, request, current_app
-from functools import update_wrapper
+from itsdangerous import TimedJSONWebSignatureSerializer
+from flask import make_response, request, current_app, Response
+from functools import update_wrapper, wraps
+from .helpers import get_jwt_payload
+
+jss = TimedJSONWebSignatureSerializer('dude')
+
+
+def handle_jwt_auth(f):
+    """
+    View decorator that checks that the JWT token in the request
+    is valid. If so, it returns the view's response and updates the header
+    with a new JWT token with new exp field.
+    """
+    @wraps(f)
+    def wrapped_function(*args, **kwargs):
+        payload = get_jwt_payload()
+        print("payload", payload)
+        if payload is None:
+            return Response("PROTECTED - Please sign in.", 400)
+
+        token = jss.dumps(payload)
+        resp = make_response(f(*args, **kwargs))
+        print(resp)
+        resp.headers['Authentication'] = "Bearer {}".format(token)
+        return resp
+
+    return wrapped_function
 
 
 def crossdomain(origin=None, methods=None, headers=None,
