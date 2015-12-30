@@ -27,6 +27,16 @@ def authenticate_for_jwt():
     return Response("Could not authenticate user.", 400)
 
 
+@app.route('protected', methods=['POST'])
+def test_protected():
+    """
+    This view should only return json if the user is authorized
+    via JWT token in header of request.
+    This should be completed using a decorator function.
+    """
+    pass
+
+
 @app.route('/test/', methods=['POST'])
 def test_jwt():
     payload = get_jwt_payload()
