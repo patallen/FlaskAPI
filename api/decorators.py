@@ -4,7 +4,9 @@ from flask import make_response, request, current_app, Response
 from functools import update_wrapper, wraps
 from .helpers import get_jwt_payload
 
-jss = TimedJSONWebSignatureSerializer('dude')
+from app import app
+
+jss = TimedJSONWebSignatureSerializer(app.config['JWT_SECRET'])
 
 
 def handle_jwt_auth(f):
@@ -16,13 +18,11 @@ def handle_jwt_auth(f):
     @wraps(f)
     def wrapped_function(*args, **kwargs):
         payload = get_jwt_payload()
-        print("payload", payload)
         if payload is None:
             return Response("PROTECTED - Please sign in.", 400)
 
         token = jss.dumps(payload)
         resp = make_response(f(*args, **kwargs))
-        print(resp)
         resp.headers['Authentication'] = "Bearer {}".format(token)
         return resp
 
